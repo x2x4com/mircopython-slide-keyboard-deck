@@ -153,42 +153,27 @@ rt.motor_pin2.off()
 rt.led.off()
 rt.bling_led.high()
 
-def limited_close_callback(pin):
+def irq_handler(pin):
     global rt
-    #_v = pin.value()
-    #if pin.value() == 1:
-        #print(f"limited_close pressed!, current value: {_v}")
-    rt.motor_stop()
- 
-def limited_open_callback(pin):
-    global rt
-    #_v = pin.value()
-    #if pin.value() == 1:
-        #print(f"limited_open pressed!, current value: {_v}")
-    rt.motor_stop()
-
-def trigger_close_callback(pin):
-    global rt
-    #_v = pin.value()
-    if pin.value() == 1:  # 按下时触发
-        #print(f"trigger_close pressed!, current value: {_v}")
+    print(f"IRQ triggered on pin: {pin}")
+    if pin == rt.limited_close and pin.value() == 1:
+        rt.motor_stop()
+    elif pin == rt.limited_open and pin.value() == 1:
+        rt.motor_stop()
+    elif pin == rt.trigger_close and pin.value() == 1:
         rt.set_manual_control_on()
         rt.close()
-
-def trigger_open_callback(pin):
-    global rt
-    #_v = pin.value()
-    if pin.value() == 1:  # 按下时触发
-        #print(f"trigger_open pressed!, current value: {_v}")
+    elif pin == rt.trigger_open and pin.value() == 1:
         rt.set_manual_control_on()
         rt.open()
 
-rt.limited_close.irq(trigger=machine.Pin.IRQ_RISING, handler=limited_close_callback)
-rt.limited_open.irq(trigger=machine.Pin.IRQ_RISING, handler=limited_open_callback)
-rt.trigger_close.irq(trigger=machine.Pin.IRQ_RISING, handler=trigger_close_callback)
-rt.trigger_open.irq(trigger=machine.Pin.IRQ_RISING, handler=trigger_open_callback)
+rt.limited_close.irq(trigger=machine.Pin.IRQ_RISING, handler=irq_handler)
+rt.limited_open.irq(trigger=machine.Pin.IRQ_RISING, handler=irq_handler)
+rt.trigger_close.irq(trigger=machine.Pin.IRQ_RISING, handler=irq_handler)
+rt.trigger_open.irq(trigger=machine.Pin.IRQ_RISING, handler=irq_handler)
 
 print("System is ready. Press buttons to trigger events.")
 while True:
     #rt.run()
-    utime.sleep(1) 
+    utime.sleep(1)
+    
